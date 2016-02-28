@@ -13,15 +13,19 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         {
             GameObject objectFound = null;
             var hitColliders = Physics.OverlapSphere(transform.position, viewDistance, objectLayerMask);
-            if (hitColliders != null) {
+            if (hitColliders != null)
+            {
                 float minAngle = Mathf.Infinity;
-                for (int i = 0; i < hitColliders.Length; ++i) {
+                for (int i = 0; i < hitColliders.Length; ++i)
+                {
                     float angle;
                     GameObject obj;
                     // Call the WithinSight function to determine if this specific object is within sight
-                    if ((obj = WithinSight(transform, positionOffset, fieldOfViewAngle, viewDistance, hitColliders[i].gameObject, targetOffset, false, out angle, ignoreLayerMask)) != null) {
+                    if ((obj = WithinSight(transform, positionOffset, fieldOfViewAngle, viewDistance, hitColliders[i].gameObject, targetOffset, false, out angle, ignoreLayerMask)) != null)
+                    {
                         // This object is within sight. Set it to the objectFound GameObject if the angle is less than any of the other objects
-                        if (angle < minAngle) {
+                        if (angle < minAngle)
+                        {
                             minAngle = angle;
                             objectFound = obj;
                         }
@@ -37,15 +41,19 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         {
             GameObject objectFound = null;
             var hitColliders = Physics2D.OverlapCircleAll(transform.position, viewDistance, objectLayerMask);
-            if (hitColliders != null) {
+            if (hitColliders != null)
+            {
                 float minAngle = Mathf.Infinity;
-                for (int i = 0; i < hitColliders.Length; ++i) {
+                for (int i = 0; i < hitColliders.Length; ++i)
+                {
                     float angle;
                     GameObject obj;
                     // Call the 2D WithinSight function to determine if this specific object is within sight
-                    if ((obj = WithinSight(transform, positionOffset, fieldOfViewAngle, viewDistance, hitColliders[i].gameObject, targetOffset, true, out angle, ignoreLayerMask)) != null) {
+                    if ((obj = WithinSight(transform, positionOffset, fieldOfViewAngle, viewDistance, hitColliders[i].gameObject, targetOffset, true, out angle, ignoreLayerMask)) != null)
+                    {
                         // This object is within sight. Set it to the objectFound GameObject if the angle is less than any of the other objects
-                        if (angle < minAngle) {
+                        if (angle < minAngle)
+                        {
                             minAngle = angle;
                             objectFound = obj;
                         }
@@ -76,18 +84,25 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         {
             // The target object needs to be within the field of view of the current object
             var direction = targetObject.transform.position - transform.TransformPoint(positionOffset);
-            if (usePhysics2D) {
+            if (usePhysics2D)
+            {
                 angle = Vector3.Angle(direction, transform.up);
                 direction.z = 0;
-            } else {
+            }
+            else
+            {
                 angle = Vector3.Angle(direction, transform.forward);
                 direction.y = 0;
             }
-            if (direction.magnitude < viewDistance && angle < fieldOfViewAngle * 0.5f) {
+            if (direction.magnitude < viewDistance && angle < fieldOfViewAngle * 0.5f)
+            {
                 // The hit agent needs to be within view of the current agent
-                if (LineOfSight(transform, positionOffset, targetObject, targetOffset, usePhysics2D, ignoreLayerMask) != null) {
+                if (LineOfSight(transform, positionOffset, targetObject, targetOffset, usePhysics2D, ignoreLayerMask) == targetObject)
+                {
                     return targetObject; // return the target object meaning it is within sight
-                } else if (targetObject.GetComponent<Collider>() == null) {
+                }
+                else if (targetObject.GetComponent<Collider>() == null && targetObject.GetComponent<Collider2D>() == null)
+                {
                     // If the linecast doesn't hit anything then that the target object doesn't have a collider and there is nothing in the way
                     if (targetObject.gameObject.activeSelf)
                         return targetObject;
@@ -99,17 +114,24 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
 
         public static GameObject LineOfSight(Transform transform, Vector3 positionOffset, GameObject targetObject, Vector3 targetOffset, bool usePhysics2D, int ignoreLayerMask)
         {
-            if (usePhysics2D) {
+            if (usePhysics2D)
+            {
                 RaycastHit2D hit;
-                if ((hit = Physics2D.Linecast(transform.TransformPoint(positionOffset), targetObject.transform.TransformPoint(targetOffset), ~ignoreLayerMask))) {
-                    if (hit.transform.Equals(targetObject)) {
+                if ((hit = Physics2D.Linecast(transform.TransformPoint(positionOffset), targetObject.transform.TransformPoint(targetOffset), ~ignoreLayerMask)))
+                {
+                    if (hit.transform.gameObject == targetObject)
+                    {
                         return targetObject; // return the target object meaning it is within sight
                     }
                 }
-            } else {
+            }
+            else
+            {
                 RaycastHit hit;
-                if (Physics.Linecast(transform.TransformPoint(positionOffset), targetObject.transform.TransformPoint(targetOffset), out hit, ~ignoreLayerMask)) {
-                    if (hit.transform.Equals(targetObject.transform) || targetObject.transform.IsChildOf(hit.transform)) {
+                if (Physics.Linecast(transform.TransformPoint(positionOffset), targetObject.transform.TransformPoint(targetOffset), out hit, ~ignoreLayerMask))
+                {
+                    if (hit.transform.Equals(targetObject.transform) || targetObject.transform.IsChildOf(hit.transform))
+                    {
                         return targetObject; // return the target object meaning it is within sight
                     }
                 }
@@ -123,15 +145,19 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         {
             GameObject objectHeard = null;
             var hitColliders = Physics.OverlapSphere(transform.TransformPoint(positionOffset), hearingRadius, objectLayerMask);
-            if (hitColliders != null) {
+            if (hitColliders != null)
+            {
                 float maxAudibility = 0;
-                for (int i = 0; i < hitColliders.Length; ++i) {
+                for (int i = 0; i < hitColliders.Length; ++i)
+                {
                     float audibility = 0;
                     GameObject obj;
                     // Call the WithinHearingRange function to determine if this specific object is within hearing range
-                    if ((obj = WithinHearingRange(transform, positionOffset, audibilityThreshold, hitColliders[i].gameObject, ref audibility)) != null) {
+                    if ((obj = WithinHearingRange(transform, positionOffset, audibilityThreshold, hitColliders[i].gameObject, ref audibility)) != null)
+                    {
                         // This object is within hearing range. Set it to the objectHeard GameObject if the audibility is less than any of the other objects
-                        if (audibility > maxAudibility) {
+                        if (audibility > maxAudibility)
+                        {
                             maxAudibility = audibility;
                             objectHeard = obj;
                         }
@@ -140,22 +166,26 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
             }
             return objectHeard;
         }
-        
+
         // Cast a circle with the desired radius. Check each object's audio source to see if audio is playing. If audio is playing
         // and its audibility is greater than the audibility threshold then return the object heard
         public static GameObject WithinHearingRange2D(Transform transform, Vector3 positionOffset, float audibilityThreshold, float hearingRadius, LayerMask objectLayerMask)
         {
             GameObject objectHeard = null;
             var hitColliders = Physics2D.OverlapCircleAll(transform.TransformPoint(positionOffset), hearingRadius, objectLayerMask);
-            if (hitColliders != null) {
+            if (hitColliders != null)
+            {
                 float maxAudibility = 0;
-                for (int i = 0; i < hitColliders.Length; ++i) {
+                for (int i = 0; i < hitColliders.Length; ++i)
+                {
                     float audibility = 0;
                     GameObject obj;
                     // Call the WithinHearingRange function to determine if this specific object is within hearing range
-                    if ((obj = WithinHearingRange(transform, positionOffset, audibilityThreshold, hitColliders[i].gameObject, ref audibility)) != null) {
+                    if ((obj = WithinHearingRange(transform, positionOffset, audibilityThreshold, hitColliders[i].gameObject, ref audibility)) != null)
+                    {
                         // This object is within hearing range. Set it to the objectHeard GameObject if the audibility is less than any of the other objects
-                        if (audibility > maxAudibility) {
+                        if (audibility > maxAudibility)
+                        {
                             maxAudibility = audibility;
                             objectHeard = obj;
                         }
@@ -177,16 +207,23 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         {
             AudioSource[] colliderAudioSource;
             // Check to see if the hit agent has an audio source and that audio source is playing
-            if ((colliderAudioSource = GetAudioSources(targetObject)) != null) {
-                for (int i = 0; i < colliderAudioSource.Length; ++i) {
-                    if (colliderAudioSource[i].isPlaying) {
+            if ((colliderAudioSource = GetAudioSources(targetObject)) != null)
+            {
+                for (int i = 0; i < colliderAudioSource.Length; ++i)
+                {
+                    if (colliderAudioSource[i].isPlaying)
+                    {
                         var distance = Vector3.Distance(transform.position, targetObject.transform.position);
-                        if (colliderAudioSource[i].rolloffMode == AudioRolloffMode.Logarithmic) {
+                        if (colliderAudioSource[i].rolloffMode == AudioRolloffMode.Logarithmic)
+                        {
                             audibility = colliderAudioSource[i].volume / Mathf.Max(colliderAudioSource[i].minDistance, distance - colliderAudioSource[i].minDistance);
-                        } else { // linear
-                            audibility = colliderAudioSource[i].volume * Mathf.Clamp01((distance - colliderAudioSource[i].minDistance) / (colliderAudioSource[i].maxDistance - colliderAudioSource[i].minDistance)); 
                         }
-                        if (audibility > audibilityThreshold) {
+                        else
+                        { // linear
+                            audibility = colliderAudioSource[i].volume * Mathf.Clamp01((distance - colliderAudioSource[i].minDistance) / (colliderAudioSource[i].maxDistance - colliderAudioSource[i].minDistance));
+                        }
+                        if (audibility > audibilityThreshold)
+                        {
                             return targetObject;
                         }
                     }
@@ -215,12 +252,14 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement
         // Caches the AudioSource GetComponents for quick lookup
         private static AudioSource[] GetAudioSources(GameObject target)
         {
-            if (transformAudioSourceMap == null) {
+            if (transformAudioSourceMap == null)
+            {
                 transformAudioSourceMap = new Dictionary<GameObject, AudioSource[]>();
             }
 
             AudioSource[] audioSources;
-            if (transformAudioSourceMap.TryGetValue(target, out audioSources)) {
+            if (transformAudioSourceMap.TryGetValue(target, out audioSources))
+            {
                 return audioSources;
             }
 

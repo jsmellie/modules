@@ -17,6 +17,17 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         [Tooltip("Maximum amount of time that the agent will wait before trying to wander again.")]
         public SharedFloat maxWaitTime = 0;
 
+        [Tooltip("The LayerMask of the objects that we are searching for")]
+        public LayerMask objectLayerMask;
+        [Tooltip("The LayerMask of the objects to ignore when performing the line of sight check")]
+        public LayerMask ignoreLayerMask = 1 << LayerMask.NameToLayer("Ignore Raycast");
+        [Tooltip("The field of view angle of the agent (in degrees)")]
+        public SharedFloat fieldOfViewAngle = 90;
+        [Tooltip("The distance that the agent can see")]
+        public SharedFloat viewDistance = 10;
+        [Tooltip("The object that is within sight")]
+        public SharedGameObject returnedObject;
+
         // The time to wait
         private float waitDuration;
         // The time that the task started to wait.
@@ -32,7 +43,16 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         }
 
         public override TaskStatus OnUpdate()
-        {
+        { 
+            //Check to see if the object is within sight
+            returnedObject.Value = MovementUtility.WithinSight2D(transform, Vector3.zero, fieldOfViewAngle.Value, viewDistance.Value, objectLayerMask, Vector3.zero, ignoreLayerMask);
+
+            //If we found something, return success
+            if (returnedObject.Value != null)
+            {
+                return TaskStatus.Success;
+            }
+
             if (HasArrived() && float.IsNaN(startTime))
             {
                 startTime = Time.time;
