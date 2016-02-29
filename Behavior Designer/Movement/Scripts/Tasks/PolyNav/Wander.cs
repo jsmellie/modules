@@ -16,6 +16,8 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         public SharedFloat minWaitTime = 0;
         [Tooltip("Maximum amount of time that the agent will wait before trying to wander again.")]
         public SharedFloat maxWaitTime = 0;
+        [Tooltip("Should wait on start")]
+        public SharedBool waitOnStart = true;
 
         [Tooltip("The LayerMask of the objects that we are searching for")]
         public LayerMask objectLayerMask;
@@ -39,7 +41,15 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         {
             base.OnStart();
 
-            SetDestination(Target());
+            if (waitOnStart.Value)
+            {
+                startTime = Time.time;
+                waitDuration = Random.Range(minWaitTime.Value, maxWaitTime.Value);
+            }
+            else
+            {
+                SetDestination(Target());
+            }
         }
 
         public override TaskStatus OnUpdate()
@@ -62,7 +72,7 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
             else if (startTime + waitDuration < Time.time)
             {
                 startTime = float.NaN;
-                return TaskStatus.Success;
+                SetDestination(Target());
             }
             // Otherwise we are still waiting or wandering
             return TaskStatus.Running;
