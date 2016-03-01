@@ -15,18 +15,6 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         [Tooltip("The waypoints to move to")]
         public SharedGameObjectList waypoints;
 
-        [Space()]
-        [Tooltip("The LayerMask of the objects that we are searching for")]
-        public LayerMask objectLayerMask;
-        [Tooltip("The LayerMask of the objects to ignore when performing the line of sight check")]
-        public LayerMask ignoreLayerMask = 1 << LayerMask.NameToLayer("Ignore Raycast");
-        [Tooltip("The field of view angle of the agent (in degrees)")]
-        public SharedFloat fieldOfViewAngle = 90;
-        [Tooltip("The distance that the agent can see")]
-        public SharedFloat viewDistance = 10;
-        [Tooltip("The object that is within sight")]
-        public SharedGameObject returnedObject;
-
         // The current index that we are heading towards within the waypoints array
         private int waypointIndex;
         private float waypointReachedTime;
@@ -53,15 +41,6 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
         // Patrol around the different waypoints specified in the waypoint array. Always return a task status of running. 
         public override TaskStatus OnUpdate()
         {
-            //Check to see if the object is within sight
-            returnedObject.Value = MovementUtility.WithinSight2D(transform, Vector3.zero, fieldOfViewAngle.Value, viewDistance.Value, objectLayerMask, Vector3.zero, ignoreLayerMask);
-
-            //If we found something, return success
-            if (returnedObject.Value != null)
-            {
-                return TaskStatus.Success;
-            }
-
             if (HasArrived())
             {
                 if (waypointReachedTime == -waypointPauseDuration.Value)
@@ -118,9 +97,6 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
             randomPatrol = false;
             waypointPauseDuration = 0;
             waypoints = null;
-
-            fieldOfViewAngle = 90;
-            viewDistance = 10;
         }
 
         // Draw a gizmo indicating a patrol 
@@ -141,8 +117,6 @@ namespace BehaviorDesigner.Runtime.Tasks.Movement.PolyNav
                 }
             }
             UnityEditor.Handles.color = oldColor;
-
-            MovementUtility.DrawLineOfSight(Owner.transform, Vector3.zero, fieldOfViewAngle.Value, viewDistance.Value, true);
 #endif
         }
     }
