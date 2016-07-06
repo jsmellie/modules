@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
@@ -1371,12 +1372,27 @@ public class NewScriptWindow : EditorWindow
 
     private static string CodifyString(string value)
     {
+        //Make sure it doesn't start with a number
         while (value.Length > 0 && value[0] >= '0' && value[0] <= '9')
         {
             value = value.Remove(0, 1);
         }
 
-        value = value.Replace(" ", "");
+        //Make sure that it's only letters
+        List<int> invalidIndices = new List<int>();
+
+        for (int i = 0; i < value.Length; ++i)
+        {
+            if (!Regex.IsMatch(value[i].ToString(), @"^[a-zA-Z]+$"))
+            {
+                invalidIndices.Add(i);
+            }
+        }
+
+        for (int i = 0; i < invalidIndices.Count; ++i)
+        {
+            value = value.Remove(invalidIndices[i] - i, 1);
+        }
 
         return value;
     }

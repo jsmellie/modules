@@ -45,9 +45,12 @@ using System.Collections;
         // Debug related
         public const string TESTING_CATEGORY = "TESTING";
 
+        //Default related
+        public const string DEFAULT_ATEGORY = "DEFAULT";
+
         public static string GetDefaultCategory()
         {
-            string defaultCategory = TESTING_CATEGORY;
+            string defaultCategory = DEFAULT_ATEGORY;
             GetPartialDefaultCategory(ref defaultCategory);
             return defaultCategory;
         }

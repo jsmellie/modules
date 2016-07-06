@@ -17,7 +17,9 @@
 #region Includes
 #region Unity Includes
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 #endregion
 
 #region System Includes
@@ -35,11 +37,16 @@ namespace Starvoxel.EditorUtilities
 	public static class ScriptableObjectUtility
 	{	
 		#region Public Methods
-        public static void CreateAsset<T> () where T : ScriptableObject
+#if UNITY_EDITOR
+        public static void CreateAsset<T>(string customPath = null) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
 
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            if (!string.IsNullOrEmpty(customPath))
+            {
+                path = customPath;
+            }
             if (path == "")
             {
                 path = "Assets";
@@ -75,6 +82,7 @@ namespace Starvoxel.EditorUtilities
 
             return assetPathAndName;
         }
+#endif
 		#endregion
 	
 		#region Protected Methods
